@@ -4,7 +4,7 @@
 
 This project bridges the gap between Digital Design, Computer Organization (DDCO), and visual creativity. It simulates how hardware faults—like "stuck-at" bits or cosmic ray bit flips—affect data stored in RAM.
 
-## 🚀 Quick Start
+##  Quick Start
 
 1.  **Install Dependencies**:
     ```bash
@@ -17,7 +17,7 @@ This project bridges the gap between Digital Design, Computer Organization (DDCO
     ```
     This will open the "Chaos Engine" interface in your web browser.
 
-## 🧠 Core Concepts
+##  Core Concepts
 
 ### 1. The Logic: Bitwise Operations
 The core engine treats the image as a raw byte array (simulated RAM) and applies bitwise operators:
@@ -34,13 +34,14 @@ The core engine treats the image as a raw byte array (simulated RAM) and applies
 *   **Endianness**: The "Swap Endianness" toggle simulates reading 32-bit words in the wrong byte order (Little vs Big Endian), scrambling the color channels.
 *   **Memory Mapping**: Use the Channel Isolation checkboxes to apply corruption only to specific memory blocks (Red, Green, or Blue channels).
 
-## 🛠️ Tech Stack
+## Tech Stack
 *   **Python**: Core logic.
 *   **NumPy**: Efficient array manipulation and bitwise operations.
 *   **Pillow (PIL)**: Image processing.
 *   **Streamlit**: Interactive web interface.
 
-## 📂 Project Structure
+## Project Structure
 *   `app.py`: The interactive frontend.
 *   `glitch_engine.py`: The backend logic handling byte manipulation.
 *   `requirements.txt`: Project dependencies.
+
