@@ -1,13 +1,38 @@
 import numpy as np
 from PIL import Image
 import io
+from image_validation import ImageValidator, ImageValidationError
 
 class GlitchEngine:
     def __init__(self, image_source):
         """
-        Initialize with an image source (file path or bytes).
+        Initialize with an image source (file path, bytes, or file-like object).
+        Performs security validation before processing.
         """
-        self.original_image = Image.open(image_source).convert('RGB')
+        # Validate image for security (defense in depth)
+        try:
+            # Handle different input types
+            if hasattr(image_source, 'read'):
+                # File-like object (e.g., Streamlit UploadedFile)
+                validated_image = ImageValidator.validate(image_source)
+                self.original_image = validated_image
+            elif isinstance(image_source, str):
+                # File path - open and validate
+                with open(image_source, 'rb') as f:
+                    validated_image = ImageValidator.validate(f, filename=image_source)
+                self.original_image = validated_image
+            elif isinstance(image_source, bytes):
+                # Bytes object
+                validated_image = ImageValidator.validate(image_source)
+                self.original_image = validated_image
+            else:
+                # Fallback: try PIL directly (less secure, but for compatibility)
+                self.original_image = Image.open(image_source).convert('RGB')
+        except ImageValidationError as e:
+            raise ValueError(f"Image validation failed: {str(e)}")
+        except Exception as e:
+            raise ValueError(f"Failed to load image: {str(e)}")
+        
         self.width, self.height = self.original_image.size
         # Convert to numpy array
         self.original_array = np.array(self.original_image)

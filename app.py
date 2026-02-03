@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 from glitch_engine import GlitchEngine
+from image_validation import ImageValidator, ImageValidationError
 import io
 import base64
 
@@ -187,7 +188,18 @@ with col_left:
     if uploaded_file:
         # Reset file pointer to be safe
         uploaded_file.seek(0)
-        st.session_state.engine = GlitchEngine(uploaded_file)
+        
+        # Validate uploaded image for security
+        try:
+            validated_image = ImageValidator.validate(uploaded_file, filename=uploaded_file.name)
+            # Reset file pointer after validation
+            uploaded_file.seek(0)
+            st.session_state.engine = GlitchEngine(uploaded_file)
+        except ImageValidationError as e:
+            st.error(f"⚠️ SECURITY VALIDATION FAILED: {str(e)}")
+            st.info("Please upload a valid JPEG or PNG image file.")
+            st.session_state.engine = None
+            uploaded_file = None
         
         col_c1, col_c2 = st.columns(2)
         with col_c1:
