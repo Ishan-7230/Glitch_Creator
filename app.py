@@ -5,7 +5,6 @@ from glitch_engine import GlitchEngine
 import io
 import base64
 
-# Page Config
 st.set_page_config(
     page_title="Glitch Art // Memory Corruptor",
     page_icon="⚡",
@@ -13,7 +12,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS FOR URBAN/STREETWEAR AESTHETIC ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Permanent+Marker&display=swap');
@@ -143,9 +141,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- LAYOUT ---
 
-# Top Nav (Visual Only)
 st.markdown("""
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #ddd; padding-bottom: 20px;">
     <div style="font-weight: 700; font-size: 1.2rem;">GLITCH.CREATOR</div>
@@ -157,7 +153,7 @@ st.markdown("""
 col_left, col_right = st.columns([1, 1.5], gap="large")
 
 with col_left:
-    # Title Section
+    
     st.markdown("""
     <div>
         <h1>GLITCH.<span class="accent-text">ART</span></h1>
@@ -174,24 +170,24 @@ with col_left:
     
     st.markdown('<div class="deco-line"></div>', unsafe_allow_html=True)
 
-    # Controls Section (Styled as "Project Specs")
+   
     st.markdown("### // SYSTEM PARAMETERS")
     
-    # Input Source: Static Image Files ONLY (No Live Camera Feed)
+   
     uploaded_file = st.file_uploader("LOAD SOURCE DATA", type=['jpg', 'jpeg', 'png'])
     
-    # Initialize session state for the engine to avoid reloading
+   
     if 'engine' not in st.session_state:
         st.session_state.engine = None
     
     if uploaded_file:
-        # Reset file pointer to be safe
+        
         uploaded_file.seek(0)
         st.session_state.engine = GlitchEngine(uploaded_file)
         
         col_c1, col_c2 = st.columns(2)
         with col_c1:
-            # Default to index 1 (stuck_at_0)
+            
             fault_type = st.selectbox(
                 "FAULT TYPE",
                 ('none', 'stuck_at_0', 'stuck_at_1', 'bit_flip', 'burst_error', 'color_drift'),
@@ -199,7 +195,7 @@ with col_left:
                 format_func=lambda x: x.upper()
             )
             
-            # Dynamic Description based on selection
+            
             descriptions = {
                 'none': "System Integrity Normal.",
                 'stuck_at_0': "HARDWARE FAILURE: A memory bit is physically broken and locked to 0. Causes vertical banding and dark artifacts.",
@@ -209,14 +205,14 @@ with col_left:
                 'color_drift': "INTEGER OVERFLOW: Processor math error causing color values to wrap around. Psychedelic shifts."
             }
             
-            # Styled Info Box
+           
             st.markdown(f"""
             <div style="background-color: #e0e0e0; padding: 10px; border-left: 3px solid #ff3333; font-size: 0.8rem; margin-bottom: 10px; color: #333;">
                 <b>// DIAGNOSTIC:</b> {descriptions.get(fault_type, "")}
             </div>
             """, unsafe_allow_html=True)
             
-            # Default to 7 (MSB) for maximum destruction
+            
             target_bit = st.slider(
                 "TARGET BIT (MSB-LSB)",
                 0, 7, 7,
@@ -224,7 +220,7 @@ with col_left:
             )
             
         with col_c2:
-            # Default to 0.5 (50%) for obvious effect
+            
             probability = st.slider(
                 "CHAOS LEVEL",
                 0.0, 1.0, 0.5,
@@ -241,7 +237,7 @@ with col_left:
         
         st.markdown("### // AI TARGETING")
         
-        # Check for AI dependencies
+
         ai_available = False
         try:
             import torch
@@ -256,7 +252,7 @@ with col_left:
             st.warning("AI features unavailable. Please check console.")
             use_mask = False
         
-        # Run Button
+        
         st.markdown("<br>", unsafe_allow_html=True)
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
@@ -264,8 +260,8 @@ with col_left:
         with col_btn2:
             run_variations = st.button("GENERATE 4 VARIATIONS")
             
-        # Interactive Guide (Collapsed to keep it simple)
-        with st.expander("📚 HOW IT WORKS (DDCO CONCEPTS)"):
+        
+        with st.expander(" HOW IT WORKS (DDCO CONCEPTS)"):
             st.markdown("""
             **1. The Byte Array (RAM)**
             Images are just numbers in RAM. We load the image as a flat array of bytes (0-255).
@@ -283,11 +279,11 @@ with col_left:
             """)
 
 with col_right:
-    # Image Display Area
+    
     if uploaded_file and st.session_state.engine:
         engine = st.session_state.engine
         
-        # Initialize Segmenter if needed
+       
         mask = None
         if use_mask and ai_available:
             with st.spinner("🧠 AI Analyzing Image..."):
@@ -298,12 +294,10 @@ with col_right:
                     
                     mask = st.session_state.segmenter.get_tshirt_mask(engine.original_image)
                     
-                    # Check if mask is empty (no t-shirt found)
+                    
                     if not np.any(mask):
                         st.warning("⚠️ AI detected no T-Shirt/Upper-Clothes. The glitch effect will not be visible. Uncheck 'AI TARGETING' or try a different image.")
-                        mask = None # Fallback to None? No, user asked for targeting. If None, it glitches everything. 
-                        # If we leave it as all-False mask, it glitches nothing (which is what happens now).
-                        # The warning explains it.
+                        mask = None
                         
                 except Exception as e:
                     st.error(f"AI Model Error: {e}")
@@ -312,36 +306,34 @@ with col_right:
             st.markdown("### // RANDOMIZED CHAOS GENERATOR")
             v_col1, v_col2 = st.columns(2)
             
-            # Available modes (Removed 'sync_loss' as requested/interpreted)
-            # We focus on the ones that produce "Crazy" results
             modes = ['stuck_at_0', 'stuck_at_1', 'bit_flip', 'color_drift', 'burst_error']
             
             import random
             
             for i in range(4):
-                # Randomize Parameters
+               
                 mode = random.choice(modes)
                 
-                # Force higher bits for visibility (3-7)
+               
                 t_bit = random.randint(3, 7)
                 
-                # Random probability (skewed towards chaos)
+                
                 prob = random.uniform(0.05, 0.4)
                 if mode == 'burst_error': prob = random.uniform(0.01, 0.1) # Lower for burst
                 
-                # Random Endianness
+                
                 swap = random.choice([True, False])
                 
-                # Random Channels
+                
                 ch = {
                     'R': random.choice([True, False]), 
                     'G': random.choice([True, False]), 
                     'B': random.choice([True, False])
                 }
-                # Ensure at least one channel is active
+                
                 if not any(ch.values()): ch['G'] = True
                 
-                # Generate
+                
                 img = engine.corrupt(
                     fault_type=mode, 
                     target_bit=t_bit, 
@@ -353,7 +345,7 @@ with col_right:
                 
                 caption = f"#{i+1} // {mode.upper()} // BIT {t_bit}"
                 
-                # Display in grid
+                
                 if i % 2 == 0:
                     with v_col1:
                         st.image(img, caption=caption, use_column_width=True)
@@ -362,9 +354,7 @@ with col_right:
                         st.image(img, caption=caption, use_column_width=True)
                 
         else:
-            # Default Single Execution
-            # Logic
-            # We run this every time the script reruns (reactive)
+            
             try:
                 glitched_image = engine.corrupt(
                     fault_type=fault_type,
@@ -375,10 +365,10 @@ with col_right:
                     mask=mask
                 )
                 
-                # Display
+                
                 st.image(glitched_image, use_column_width=True)
                 
-                # Metadata / Download
+                
                 st.markdown("""
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
                     <div style="font-family: monospace; color: #666; font-size: 0.8rem;">
@@ -390,7 +380,7 @@ with col_right:
                 </div>
                 """.format(glitched_image.width, glitched_image.height), unsafe_allow_html=True)
                 
-                # Download Button
+                
                 buf = io.BytesIO()
                 glitched_image.save(buf, format="PNG")
                 byte_im = buf.getvalue()
@@ -405,7 +395,7 @@ with col_right:
                 st.error(f"SYSTEM FAILURE: {e}")
         
     else:
-        # Placeholder State
+        
         st.markdown("""
         <div style="background: #e0e0e0; height: 500px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
             <div style="text-align: center; color: #999;">
@@ -416,7 +406,7 @@ with col_right:
         """, unsafe_allow_html=True)
 
 
-# Footer / Technical Details
+
 st.markdown("---")
 st.markdown("""
 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 0.8rem; color: #666;">
@@ -434,3 +424,4 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
